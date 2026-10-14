@@ -3,6 +3,7 @@ import { ref } from "vue";
 import {
   NButton,
   NInput,
+  NInputNumber,
   useMessage,
   NSelect,
   NCard,
@@ -12,156 +13,92 @@ import {
 } from "naive-ui";
 
 const message = useMessage();
-
-const count = ref<number>(0);
-
-function increaseCount(): void {
-  count.value++;
-}
-function resetCount(): void {
-  count.value = 0;
-}
-const vendorName = ref<string>("");
-function saveVendor(): void {
-  if (vendorName.value.trim() === "") {
-    message.error("Please enter a vendor name");
-  } else {
-    message.success(`${vendorName.value} is added`);
-  }
-}
-const vendors = [
-  {
-    label: "Grand Marina",
-    value: "Grand Marina",
-  },
-  {
-    label: "Sunset Bay & Resort",
-    value: "Sunset Bay & Resort",
-  },
-  {
-    label: "GlobalVisa",
-    value: "GlobalVisa",
-  },
-  {
-    label: "CityLine Transport",
-    value: "CityLine Transport",
-  },
-];
-const vendorsTable = [
-  {
-    name: "Grand Marina",
-    price: 25000,
-  },
-  {
-    name: "Sunset Bay & Resort",
-    price: 20000,
-  },
-  {
-    name: "GlobalVisa",
-    price: 15000,
-  },
-  {
-    name: "CityLine Transport",
-    price: 30000,
-  },
-];
-const selectedVendor = ref<string | null>(null);
+const vendorName = ref<string | null>(null);
+const vendorPrice = ref<number | null>(null);
+type status = "submitted" | "pending";
 interface Vendor {
   name: string;
   price: number;
+  status: status;
 }
-
-const vendorData: Vendor[] = [
+const vendorsQuotation = ref<Vendor[]>([
   {
-    name: "Grand Marina",
-    price: 25000,
+    name: "Grand Marina Hotel",
+    price: 10000,
+    status: "submitted",
   },
   {
     name: "Sunset Bay & Resort",
-    price: 20000,
+    price: 15000,
+    status: "submitted",
   },
   {
     name: "GlobalVisa",
-    price: 15000,
+    price: 20000,
+    status: "pending",
   },
   {
-    name: "CityLine Transport",
-    price: 30000,
+    name: "CityLine",
+    price: 25000,
+    status: "pending",
+  },
+]);
+const selectOption = [
+  {
+    label: "Submitted",
+    value: "submitted",
+  },
+  {
+    label: "Pending",
+    value: "pending",
   },
 ];
-
+const selectedStatus = ref<status>("submitted");
+const addQuotation = (): void => {
+  if (vendorPrice.value !== null && vendorPrice.value < 1) {
+    message.error("Price should be greater than 0");
+  } else if (vendorName.value?.trim() && vendorPrice.value !== null) {
+    vendorsQuotation.value.push({
+      name: vendorName.value.trim(),
+      price: vendorPrice.value,
+      status: selectedStatus.value,
+    });
+    vendorName.value = null;
+    vendorPrice.value = null;
+    message.success("Vendor is added");
+  } else {
+    message.error("Please enter both name and price of the vendor");
+  }
+};
 const columns = [
   {
     title: "Vendor Name",
     key: "name",
   },
   {
-    title: "Price",
+    title: "Price of Vendor",
     key: "price",
+  },
+  {
+    title: "Submission status",
+    key: "status",
   },
 ];
 </script>
 
 <template>
-  <div class="p-10">
-    <h2>My First Naive UI Practice</h2>
-
-    <p>Count: {{ count }}</p>
-
-    <n-button type="primary" @click="increaseCount"> Increase Count </n-button>
-    <br /><br />
-    <n-button type="error" @click="resetCount">Reset</n-button>
-    <br /><br />
-    <n-input
-      v-model:value="vendorName"
-      placeholder="Enter vendor name..."
-    ></n-input>
-    <n-button type="primary" @click="saveVendor">Save Vendor</n-button>
-    <br /><br />
+  <div class="p-10 flex flex-col gap-5 mx-50 mt-20 border">
+    <label for="name">Vendor Name : </label>
+    <n-input id="name" v-model:value="vendorName"></n-input>
+    <label for="price">Price : </label>
+    <n-input-number id="price" v-model:value="vendorPrice"></n-input-number>
+    <label for="status">Submission status : </label>
     <n-select
-      v-model:value="selectedVendor"
-      :options="vendors"
-      placeholder="Please select a vendor"
-      clearable
-      filterable
+      :options="selectOption"
+      v-model:value="selectedStatus"
+      id="status"
     ></n-select>
-    <br />
-    <hr />
-    <br />
-    <n-card title="Grand Marina" hoverable>
-      <p>Category : Hotel</p>
-      <p>Price : 25000</p>
-    </n-card>
-    <br />
-    <hr />
-    <br />
-    <n-card title="SkyLine Travels" hoverable>
-      <p>Category : Hotel</p>
-      <p>Price : 18000</p>
-      <n-tag type="success" round bordered>Submitted</n-tag><br /><br />
-      <n-tag type="warning" round bordered>Pending</n-tag><br /><br />
-      <n-tag type="error" round bordered>Declined</n-tag><br /><br />
-    </n-card>
-    <br />
-    <hr />
-    <br />
-    <n-table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="obj in vendorsTable" key="obj.name">
-          <td>{{ obj.name }}</td>
-          <td>{{ obj.price }}</td>
-        </tr>
-      </tbody>
-    </n-table>
-    <br />
-    <hr />
-    <br />
-    <n-data-table :columns="columns" :data="vendorData"></n-data-table>
+    <n-button @click="addQuotation">Add Quotation</n-button>
+    <n-data-table :columns="columns" :data="vendorsQuotation"></n-data-table>
   </div>
 </template>
