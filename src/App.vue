@@ -9,5 +9,6 @@ import Two from "./two.vue";
     <one />
     <two />
     <p>Hello everyone!</p>
+    <p>My name is Ayush</p>
   </n-message-provider>
 </template>
