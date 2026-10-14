@@ -10,5 +10,6 @@ import Two from "./two.vue";
     <two />
     <p>Hello everyone!</p>
     <p>My name is Ayush</p>
+    <p>I am an intern in travelexic.</p>
   </n-message-provider>
 </template>
