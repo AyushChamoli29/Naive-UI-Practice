@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import {
   NButton,
   NInput,
@@ -12,6 +12,9 @@ import {
   NDataTable,
 } from "naive-ui";
 
+onMounted(() => {
+  message.create("WELCOME GUEST!");
+});
 const message = useMessage();
 const vendorName = ref<string | null>(null);
 const vendorPrice = ref<number | null>(null);
@@ -65,7 +68,7 @@ const addQuotation = (): void => {
     });
     vendorName.value = null;
     vendorPrice.value = null;
-    message.success("Vendor is added");
+    message.success("Vendor Quotation is added");
   } else {
     message.error("Please enter both name and price of the vendor");
   }
